@@ -59,7 +59,7 @@ class GameScene: SKScene {
             player.physicsBody?.isDynamic = true  // 움직임 허용
 //            player.physicsBody?.allowsRotation = false  // 캐릭터가 회전하지 않게
             player.physicsBody?.categoryBitMask = PhysicsCategory.player
-            player.physicsBody?.collisionBitMask = PhysicsCategory.enemy | PhysicsCategory.tile
+            player.physicsBody?.collisionBitMask = PhysicsCategory.tile
             player.physicsBody?.contactTestBitMask =  PhysicsCategory.enemy | PhysicsCategory.tile | PhysicsCategory.goal
             
             playerOriginPosition = player.position
@@ -187,8 +187,7 @@ class GameScene: SKScene {
             }
         }
         
-//        print(motionManager.accelerometerData)
-        if motionManager.isAccelerometerAvailable {
+        if (motionManager.isAccelerometerAvailable && !isCompleted) {
             if let accelerometerData = motionManager.accelerometerData {
                 // x축 가속도 값을 이용하여 좌우 이동 결정
                 // iOS에서 y축: 왼쪽이 +, 오른쪽이 - (가로모드라서 y축 사용)
@@ -254,16 +253,9 @@ class GameScene: SKScene {
         let moveAmount: CGFloat = 0.8
         let dx: CGFloat
         
-        // if문이 더러워서 정리 필요. 확인 필요!!!
-        // if문이 더러워서 정리 필요. 확인 필요!!!
-        // if문이 더러워서 정리 필요. 확인 필요!!!
         let orientation = UIDevice.current.orientation
-        if orientation == .landscapeLeft {
-            dx = (acceleration < 0) ? moveAmount: -moveAmount
-        }
-        else {
-            dx = (acceleration < 0) ? -moveAmount: moveAmount
-        }
+        let directionMultiplier: CGFloat = (orientation == .landscapeRight) ? 1 : -1
+        dx = (acceleration > 0) ? moveAmount * directionMultiplier : -moveAmount * directionMultiplier
         
         let moveAction = SKAction.moveBy(x: dx, y: 0, duration: 0.2)
         player.run(moveAction)
@@ -285,10 +277,7 @@ class GameScene: SKScene {
         isCompleted = true
         completeLabel.run(SKAction.fadeIn(withDuration: 2.0))
         
-        // 왜 안 먹히지??? 확인 필요!!!
-        // 왜 안 먹히지??? 확인 필요!!!
-        // 왜 안 먹히지??? 확인 필요!!!
-        motionManager.stopDeviceMotionUpdates() // 가속도계 사용 중지
+        motionManager.stopAccelerometerUpdates() // 가속도계 사용 중지
     }
 }
 
@@ -309,7 +298,7 @@ extension GameScene: SKPhysicsContactDelegate {
             secondBody = contact.bodyA
         }
         
-        if firstBody.categoryBitMask == PhysicsCategory.player && secondBody.categoryBitMask == PhysicsCategory.enemy {
+        if (firstBody.categoryBitMask == PhysicsCategory.player && secondBody.categoryBitMask == PhysicsCategory.enemy) && (!isCompleted) {
             failCount += 1
             print("Hit!")
             print(failCount)
