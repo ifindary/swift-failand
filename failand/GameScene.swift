@@ -41,8 +41,8 @@ class GameScene: SKScene {
     
     private var failCount = 0
     
-    let minAcceleration: CGFloat = 0.4
-    let motionManager = CMMotionManager()
+    private let minAcceleration: CGFloat = 0.4
+    private let motionManager = CMMotionManager()
     
     
     override func didMove(to view: SKView) {
