@@ -12,22 +12,30 @@ import SpriteKit
 struct GameView: View {
     let gameScene = GameScene(fileNamed: "GameScene") ?? GameScene(size: UIScreen.main.bounds.size)
     
+    @AppStorage("failCount") var failCount: Int = 0
+    
     var body: some View {
         ZStack {
             SpriteView(scene: gameScene)
                 .ignoresSafeArea() // 노치랑 홈 인디케이터까지 전부 씬을 덮기
             
-            HStack {
-                Button("왼쪽") {
-                    gameScene.movePlayer(isMovingRight: false)
-                }
-                
-                Button("오른쪽") {
-                    gameScene.movePlayer(isMovingRight: true)
+            VStack {
+                HStack {
+                    Button("Reset") {
+                        UserDefaults.standard.removeObject(forKey: "failCount")
+                        gameScene.resetFailCount()
+                    }
+                    
+                    Spacer()
+                    
+                    Text("Fail : \(failCount)")
+                        .foregroundColor(.black)
+                        .padding()
                 }
                 
                 Spacer()
             }
+            
         }
     }
 }

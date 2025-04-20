@@ -9,6 +9,7 @@
 import SpriteKit
 //import GameplayKit
 import CoreMotion
+import SwiftUI
 
 struct GameElements {
     static var playerOpacity: CGFloat = 0.1
@@ -39,11 +40,10 @@ class GameScene: SKScene {
     private var isCompleted: Bool = false
     private var playerOriginPosition = CGPoint.zero
     
-    private var failCount = 0
-    
     private let minAcceleration: CGFloat = 0.4
     private let motionManager = CMMotionManager()
     
+    @AppStorage("failCount") var failCount: Int = 0
     
     override func didMove(to view: SKView) {
         // 이 씬이 화면에 처음 표시될 때 실행되는 코드
@@ -222,17 +222,17 @@ class GameScene: SKScene {
     
     func updateGameElements() {
         // failCount에 따른 player 투명도 조절
-        GameElements.playerOpacity = min(1.0 , 0.1 + 0.1*CGFloat(failCount))
+        GameElements.playerOpacity = min(1.0 , 0.1 + 0.1*CGFloat(UserDefaults.standard.integer(forKey: "failCount")))
         player.alpha = GameElements.playerOpacity
         
         // failCount에 따른 enemy 이동 속도 조절
         self.enumerateChildNodes(withName: "//enemy") { (node, _) in
             if let enemy = node as? Enemy {
-                enemy.moveAmount = max(0.1 , 2.0 - 0.1*CGFloat(self.failCount))
+                enemy.moveAmount = max(0.1 , 2.0 - 0.1*CGFloat(UserDefaults.standard.integer(forKey: "failCount")))
             }
         }
         
-        print(GameElements.playerOpacity, max(0.1 , 2.0 - 0.1*CGFloat(self.failCount)))
+        print(GameElements.playerOpacity, max(0.1 , 2.0 - 0.1*CGFloat(UserDefaults.standard.integer(forKey: "failCount"))))
     }
     
     func setupAccelerometer() {
@@ -273,6 +273,10 @@ class GameScene: SKScene {
             player.run(moveAction)
     }
     
+    func resetFailCount() {
+        failCount = 0
+    }
+    
     func isGameCompleted() {
         isCompleted = true
         completeLabel.run(SKAction.fadeIn(withDuration: 2.0))
@@ -300,8 +304,10 @@ extension GameScene: SKPhysicsContactDelegate {
         
         if (firstBody.categoryBitMask == PhysicsCategory.player && secondBody.categoryBitMask == PhysicsCategory.enemy) && (!isCompleted) {
             failCount += 1
-            print("Hit!")
+            UserDefaults.standard.set(failCount, forKey: "failCount")
+            
             print(failCount)
+            print(UserDefaults.standard.integer(forKey: "failCount"))
             
             replacePlayerOriginPosition() // player 원래 위치로 이동
             updateGameElements() // failCount 변화에 따른 요소 제어
