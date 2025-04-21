@@ -7,7 +7,6 @@
 // 게임이 실제로 그려지고, 움직이고, 터치에 반응하는 곳
 
 import SpriteKit
-//import GameplayKit
 import CoreMotion
 import SwiftUI
 
@@ -26,7 +25,6 @@ struct PhysicsCategory {
 }
 
 class GameScene: SKScene {
-    
     private var helloLabel: SKLabelNode?
     private var spinnyNode: SKShapeNode?
     
@@ -37,13 +35,17 @@ class GameScene: SKScene {
     
     private var completeLabel: SKLabelNode!
     
-    private var isCompleted: Bool = false
+    
+    var clearHandler: (() -> Void)?
+    private var isClear: Bool = false
+    
     private var playerOriginPosition = CGPoint.zero
     
     private let minAcceleration: CGFloat = 0.4
     private let motionManager = CMMotionManager()
     
     @AppStorage("failCount") var failCount: Int = 0
+    @AppStorage("lastPlayDate") var lastPlayDate: Date = Date()
     
     override func didMove(to view: SKView) {
         // 이 씬이 화면에 처음 표시될 때 실행되는 코드
@@ -123,9 +125,9 @@ class GameScene: SKScene {
                                               SKAction.removeFromParent()]))
         }
         
-        
         spawnEnemy()
         setupAccelerometer()
+        updateGameElements()
     }
     
     
@@ -187,7 +189,7 @@ class GameScene: SKScene {
             }
         }
         
-        if (motionManager.isAccelerometerAvailable && !isCompleted) {
+        if (motionManager.isAccelerometerAvailable && !isClear) {
             if let accelerometerData = motionManager.accelerometerData {
                 // x축 가속도 값을 이용하여 좌우 이동 결정
                 // iOS에서 y축: 왼쪽이 +, 오른쪽이 - (가로모드라서 y축 사용)
@@ -217,7 +219,6 @@ class GameScene: SKScene {
                 self.addChild(enemy)
             }
         }
-        
     }
     
     func updateGameElements() {
@@ -273,15 +274,27 @@ class GameScene: SKScene {
             player.run(moveAction)
     }
     
+    func updateFailCount(_ newFailCount:Int) {
+        failCount = newFailCount
+        
+        UserDefaults.standard.set(failCount, forKey: "failCount")
+        UserDefaults.standard.set(lastPlayDate, forKey: "lastPlayDate")
+        
+        print(failCount)
+        print(UserDefaults.standard.integer(forKey: "failCount"))
+        print(lastPlayDate)
+    }
+    
     func resetFailCount() {
         failCount = 0
+        UserDefaults.standard.removeObject(forKey: "failCount")
     }
     
     func isGameCompleted() {
-        isCompleted = true
+        isClear = true
         completeLabel.run(SKAction.fadeIn(withDuration: 2.0))
-        
-        motionManager.stopAccelerometerUpdates() // 가속도계 사용 중지
+        motionManager.stopAccelerometerUpdates()
+        clearHandler?()
     }
 }
 
@@ -302,13 +315,8 @@ extension GameScene: SKPhysicsContactDelegate {
             secondBody = contact.bodyA
         }
         
-        if (firstBody.categoryBitMask == PhysicsCategory.player && secondBody.categoryBitMask == PhysicsCategory.enemy) && (!isCompleted) {
-            failCount += 1
-            UserDefaults.standard.set(failCount, forKey: "failCount")
-            
-            print(failCount)
-            print(UserDefaults.standard.integer(forKey: "failCount"))
-            
+        if (firstBody.categoryBitMask == PhysicsCategory.player && secondBody.categoryBitMask == PhysicsCategory.enemy) && (!isClear) {
+            updateFailCount(failCount+1)
             replacePlayerOriginPosition() // player 원래 위치로 이동
             updateGameElements() // failCount 변화에 따른 요소 제어
         }
