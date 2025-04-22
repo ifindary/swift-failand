@@ -26,7 +26,7 @@ struct GameView: View {
             
             VStack {
                 HStack {
-                    Button("Back") {
+                    IconButton(imageName: "BackButton", action: {
                         removeScene()
                         
                         if (failCount <= 0) {
@@ -34,15 +34,20 @@ struct GameView: View {
                         } else {
                             currentGameState = .record
                         }
-                    }
+                    })
+                    .font(.pressStart16)
+                    .padding()
                     
                     Spacer()
                     
-                    Button("Reset") {
-                        gameScene?.resetFailCount()
-                    }
+                    // for testing
+//                    Button("Reset") {
+//                        gameScene?.resetFailCount()
+//                    }
+//                    .font(.pressStart16)
                     
                     Text("Fail : \(failCount)")
+                        .font(.pressStart16)
                         .foregroundColor(.black)
                         .padding()
                 }

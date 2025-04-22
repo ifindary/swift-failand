@@ -12,10 +12,18 @@ struct HomeView: View {
     
     @AppStorage("failCount") var failCount: Int = 0
     
+    @State private var titleScale: CGFloat = 1.0
+    @State private var isButtonVisible = true
+    
     var body: some View {
-        VStack{
-            Text("Failand")
-                .font(.largeTitle)
+        VStack(spacing: 40){
+            Text("FAILAND")
+                .font(.pressStart48)
+                .scaleEffect(titleScale)
+                .animation(.easeInOut(duration: 1.0).repeatForever(autoreverses: true), value: titleScale)
+                .onAppear {
+                    titleScale = 1.1
+                }
             
             Button("Press to Start") {
                 if (failCount <= 0) {
@@ -24,8 +32,13 @@ struct HomeView: View {
                     currentGameState = .record
                 }
             }
-            .padding()
-            .foregroundColor(.black)
+            .font(.pressStart16)
+            .foregroundColor(Color("TextColor"))
+            .opacity(isButtonVisible ? 1 : 0.01)
+            .animation(.easeInOut(duration: 1.0).repeatForever(autoreverses: true), value: isButtonVisible)
+            .onAppear {
+                isButtonVisible.toggle()
+            }
         }
     }
 }

@@ -17,13 +17,19 @@ struct RecordView: View {
     
     @State private var buttonOpacity = 0.0
     
+    private var formattedDate: String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy.MM.dd.E HH:mm"
+        return formatter.string(from: lastPlayDate)
+    }
+    
     var body: some View {
         ZStack {
             HStack {
                 VStack{
-                    Button("Back") {
+                    IconButton(imageName: "BackButton", action: {
                         currentGameState = .home
-                    }
+                    })
                     
                     Spacer()
                 }
@@ -34,26 +40,29 @@ struct RecordView: View {
             
             VStack {
                 Text("Last Play")
-                    .font(.largeTitle)
-                    .padding()
-                
+                    .font(.pressStart24)
+                    .padding(26)
                 
                 Spacer()
                 
-                Text("Date : \(lastPlayDate)")
+                Text(formattedDate)
+                    .font(.pressStart16)
+                    .padding(.bottom, 16)
                 Text("Fail Count : \(failCount)")
+                    .font(.pressStart16)
+                    .padding(.bottom, 40)
                 
                 HStack {
-                    Button("New") {
+                    ImageButton(imageName: "NewButton", action: {
                         gameScene.resetFailCount()
                         currentGameState = .gameplay
-                    }
+                    })
                     .padding()
                     .foregroundColor(.black)
                     
-                    Button("Continue") {
+                    ImageButton(imageName: "ContinueButton", action: {
                         currentGameState = .gameplay
-                    }
+                    })
                     .padding()
                     .foregroundColor(.black)
                 }
