@@ -1,5 +1,5 @@
 //
-//  ImageButton.swift
+//  IconButton.swift
 //  failand
 //
 //  Created by 선애 on 4/22/25.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct ImageButton: View {
+struct IconButton: View {
     let imageName: String
     let action: () -> Void
     
@@ -17,7 +17,7 @@ struct ImageButton: View {
                 .renderingMode(.template) // 다크 모드 대응
                 .resizable()
                 .scaledToFit()
-                .frame(height: 50)
+                .frame(height: 40)
                 .foregroundColor(Color("TextColor"))
         }
     }

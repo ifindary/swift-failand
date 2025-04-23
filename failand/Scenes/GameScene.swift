@@ -74,13 +74,14 @@ class GameScene: SKScene {
             }
         }
 
-        self.goal = self.childNode(withName: "//goal") as? SKSpriteNode
-        if let goal = self.goal {
-            goal.physicsBody = SKPhysicsBody(rectangleOf: goal.size)
-            goal.physicsBody?.isDynamic = false  // 움직이지 않음
-            goal.physicsBody?.categoryBitMask = PhysicsCategory.goal
-            goal.physicsBody?.collisionBitMask = PhysicsCategory.none // 통과
-            goal.physicsBody?.contactTestBitMask = PhysicsCategory.player
+        self.enumerateChildNodes(withName: "//goal") { (node, _) in
+            if let goal = node as? SKSpriteNode {
+                goal.physicsBody = SKPhysicsBody(rectangleOf: goal.size)
+                goal.physicsBody?.isDynamic = false  // 움직이지 않음
+                goal.physicsBody?.categoryBitMask = PhysicsCategory.goal
+                goal.physicsBody?.collisionBitMask = PhysicsCategory.none // 통과
+                goal.physicsBody?.contactTestBitMask = PhysicsCategory.player
+            }
         }
         
         spawnEnemy()
@@ -197,9 +198,11 @@ class GameScene: SKScene {
     }
     
     func isGameCompleted() {
-        isClear = true
-        motionManager.stopAccelerometerUpdates()
-        clearHandler?()
+        if (!isClear) {
+            isClear = true
+            motionManager.stopAccelerometerUpdates()
+            clearHandler?()
+        }
     }
 }
 

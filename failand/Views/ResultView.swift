@@ -27,12 +27,12 @@ struct ResultView: View {
                 .multilineTextAlignment(.center)
             
             HStack(spacing: 50) {
-                IconButton(imageName: "HomeButton", action: {
+                ImageButton(imageName: "HomeButton", action: {
                     gameScene.resetFailCount()
                     currentGameState = .home
                 })
                 
-                IconButton(imageName: "RetryButton", action: {
+                ImageButton(imageName: "RetryButton", action: {
                     gameScene.resetFailCount()
                     currentGameState = .home
                 })
