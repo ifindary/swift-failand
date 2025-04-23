@@ -27,7 +27,7 @@ struct HomeView: View {
             
             Button("Press to Start") {
                 if (failCount <= 0) {
-                    currentGameState = .gameplay
+                    currentGameState = .loading
                 } else {
                     currentGameState = .record
                 }

@@ -15,8 +15,6 @@ struct RecordView: View {
     @AppStorage("failCount") var failCount: Int = 0
     @AppStorage("lastPlayDate") var lastPlayDate: Date = Date()
     
-    @State private var buttonOpacity = 0.0
-    
     private var formattedDate: String {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy.MM.dd.E HH:mm"
@@ -55,22 +53,16 @@ struct RecordView: View {
                 HStack {
                     ImageButton(imageName: "NewButton", action: {
                         gameScene.resetFailCount()
-                        currentGameState = .gameplay
+                        currentGameState = .loading
                     })
                     .padding()
                     .foregroundColor(.black)
                     
                     ImageButton(imageName: "ContinueButton", action: {
-                        currentGameState = .gameplay
+                        currentGameState = .loading
                     })
                     .padding()
                     .foregroundColor(.black)
-                }
-                .opacity(buttonOpacity)
-                .onAppear {
-                    withAnimation(.easeIn(duration: 1.0)) {
-                    buttonOpacity = 1.0
-                    }
                 }
                 
                 Spacer()

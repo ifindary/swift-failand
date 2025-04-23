@@ -10,6 +10,7 @@ import SwiftUI
 enum GameState {
     case home
     case record
+    case loading
     case gameplay
     case result
 }
@@ -24,6 +25,8 @@ struct ContentView: View {
                 HomeView(currentGameState: $currentGameState)
             case .record:
                 RecordView(currentGameState: $currentGameState)
+            case .loading:
+                LoadingView(currentGameState: $currentGameState)
             case .gameplay:
                 GameView(currentGameState: $currentGameState)
             case .result:
