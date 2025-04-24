@@ -29,7 +29,7 @@ struct LoadingView: View {
             Spacer()
             
             Image("Player")
-                .renderingMode(.template) // 다크 모드 대응
+                .renderingMode(.template)
                 .resizable()
                 .scaledToFit()
                 .frame(height: 50)

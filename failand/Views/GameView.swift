@@ -4,7 +4,6 @@
 //
 //  Created by 선애 on 4/15/25.
 //
-// 게임이 표시되는 화면(View) 관리
 
 import SwiftUI
 import SpriteKit
@@ -21,7 +20,7 @@ struct GameView: View {
         ZStack {
             if let scene = gameScene {
                 SpriteView(scene: scene)
-                    .ignoresSafeArea() // 노치랑 홈 인디케이터까지 전부 씬을 덮기
+                    .ignoresSafeArea()
             }
             
             VStack {
@@ -37,12 +36,6 @@ struct GameView: View {
                     })
                     
                     Spacer()
-                    
-                    // for testing
-//                    Button("Reset") {
-//                        gameScene?.resetFailCount()
-//                    }
-//                    .font(.pressStart16)
                     
                     Text("Fail : \(failCount)")
                         .font(.pressStart16)

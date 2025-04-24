@@ -14,7 +14,7 @@ struct IconButton: View {
     var body: some View {
         Button(action: action) {
             Image(imageName)
-                .renderingMode(.template) // 다크 모드 대응
+                .renderingMode(.template)
                 .resizable()
                 .scaledToFit()
                 .frame(height: 40)
