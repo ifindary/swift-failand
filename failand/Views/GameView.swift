@@ -35,8 +35,6 @@ struct GameView: View {
                             currentGameState = .record
                         }
                     })
-                    .font(.pressStart16)
-                    .padding()
                     
                     Spacer()
                     
@@ -49,8 +47,8 @@ struct GameView: View {
                     Text("Fail : \(failCount)")
                         .font(.pressStart16)
                         .foregroundColor(.black)
-                        .padding()
                 }
+                .padding(26)
                 
                 Spacer()
             }

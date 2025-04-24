@@ -31,7 +31,7 @@ struct RecordView: View {
                     
                     Spacer()
                 }
-                .padding()
+                .padding(26)
                 
                 Spacer()
             }
@@ -39,16 +39,15 @@ struct RecordView: View {
             VStack {
                 Text("Last Play")
                     .font(.pressStart24)
-                    .padding(26)
-                
-                Spacer()
+                    .padding(.top, 38)
+                    .padding(.bottom, 88)
                 
                 Text(formattedDate)
                     .font(.pressStart16)
                     .padding(.bottom, 16)
                 Text("Fail Count : \(failCount)")
                     .font(.pressStart16)
-                    .padding(.bottom, 40)
+                    .padding(.bottom, 50)
                 
                 HStack {
                     ImageButton(imageName: "NewButton", action: {

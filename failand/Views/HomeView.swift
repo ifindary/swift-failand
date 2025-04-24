@@ -16,14 +16,32 @@ struct HomeView: View {
     @State private var isButtonVisible = true
     
     var body: some View {
-        VStack(spacing: 40){
-            Text("FAILAND")
-                .font(.pressStart48)
+        VStack(spacing: 55){
+            Image("GameTitle")
+                .renderingMode(.template)
+                .resizable()
+                .scaledToFit()
+                .frame(height: 70)
+                .foregroundColor(Color("TextColor"))
+                .padding(.top, 35)
                 .scaleEffect(titleScale)
                 .animation(.easeInOut(duration: 1.0).repeatForever(autoreverses: true), value: titleScale)
                 .onAppear {
-                    titleScale = 1.1
+                    titleScale = 1.05
                 }
+            
+//            Image("Player")
+//                .renderingMode(.template)
+//                .resizable()
+//                .scaledToFit()
+//                .frame(height: 50)
+//                .foregroundColor(Color("TextColor"))
+//                .padding(.leading, -20)
+//                .padding(.bottom, -55)
+//            
+//            Rectangle()
+//                .fill(Color("TextColor"))
+//                .frame(maxWidth: .infinity, maxHeight: 6)
             
             Button("Press to Start") {
                 if (failCount <= 0) {

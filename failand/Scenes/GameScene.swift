@@ -50,15 +50,15 @@ class GameScene: SKScene {
         
         self.player = self.childNode(withName: "//player") as? SKSpriteNode
         if let player = self.player {
-            player.physicsBody = SKPhysicsBody(rectangleOf: player.size)
-            player.physicsBody?.isDynamic = true  // 움직임 허용
-//            player.physicsBody?.allowsRotation = false  // 캐릭터가 회전하지 않게
+//            player.physicsBody = SKPhysicsBody(rectangleOf: player.size)
+            player.physicsBody?.isDynamic = true
+            player.physicsBody?.allowsRotation = true
             player.physicsBody?.categoryBitMask = PhysicsCategory.player
             player.physicsBody?.collisionBitMask = PhysicsCategory.tile
             player.physicsBody?.contactTestBitMask =  PhysicsCategory.enemy | PhysicsCategory.tile | PhysicsCategory.goal
+            player.physicsBody?.linearDamping = 0.8
             
             playerOriginPosition = player.position
-            print("Player 초기 위치: \(playerOriginPosition)")
             
             player.alpha = GameElements.playerOpacity
         }
@@ -66,8 +66,8 @@ class GameScene: SKScene {
         self.enumerateChildNodes(withName: "//tile") { (node, _) in
             if let tile = node as? SKSpriteNode {
                 tile.physicsBody = SKPhysicsBody(rectangleOf: tile.size)
-                tile.physicsBody?.isDynamic = false  // 움직이지 않음
-                tile.physicsBody?.affectedByGravity = false  // 중력 영향 없음
+                tile.physicsBody?.isDynamic = false
+                tile.physicsBody?.affectedByGravity = false
                 tile.physicsBody?.categoryBitMask = PhysicsCategory.tile
                 tile.physicsBody?.collisionBitMask = PhysicsCategory.player | PhysicsCategory.enemy
                 tile.physicsBody?.contactTestBitMask =  PhysicsCategory.player | PhysicsCategory.enemy
@@ -77,7 +77,7 @@ class GameScene: SKScene {
         self.enumerateChildNodes(withName: "//goal") { (node, _) in
             if let goal = node as? SKSpriteNode {
                 goal.physicsBody = SKPhysicsBody(rectangleOf: goal.size)
-                goal.physicsBody?.isDynamic = false  // 움직이지 않음
+                goal.physicsBody?.isDynamic = false
                 goal.physicsBody?.categoryBitMask = PhysicsCategory.goal
                 goal.physicsBody?.collisionBitMask = PhysicsCategory.none // 통과
                 goal.physicsBody?.contactTestBitMask = PhysicsCategory.player
@@ -102,9 +102,8 @@ class GameScene: SKScene {
                 // iOS에서 y축: 왼쪽이 +, 오른쪽이 - (가로모드라서 y축 사용)
                 let acceleration = CGFloat(accelerometerData.acceleration.y)
                 
-                // 가속도 값에 따라 플레이어 이동
                 if abs(acceleration) > minAcceleration {
-                    movePlayerWithAcceleration(acceleration)
+                    movePlayer(acceleration)
                 }
             }
         }
@@ -124,6 +123,15 @@ class GameScene: SKScene {
                 // 기존 노드를 새 Enemy 객체로 교체
                 spriteNode.removeFromParent()
                 self.addChild(enemy)
+                
+                
+                let texture1 = SKTexture(imageNamed: "Monster1")
+                let texture2 = SKTexture(imageNamed: "Monster2")
+
+                let animation = SKAction.animate(with: [texture1, texture2], timePerFrame: 0.5)
+                let repeatAnimation = SKAction.repeatForever(animation)
+                
+                enemy.run(repeatAnimation)
             }
         }
     }
@@ -139,41 +147,29 @@ class GameScene: SKScene {
                 enemy.moveAmount = max(0.1 , 2.0 - 0.1*CGFloat(UserDefaults.standard.integer(forKey: "failCount")))
             }
         }
-        
-        print(GameElements.playerOpacity, max(0.1 , 2.0 - 0.1*CGFloat(UserDefaults.standard.integer(forKey: "failCount"))))
     }
     
     func setupAccelerometer() {
-        // 가속도계를 사용할 수 있는지 확인
         if motionManager.isAccelerometerAvailable {
-            // 업데이트 간격 설정 (초당 업데이트 횟수)
             motionManager.accelerometerUpdateInterval = 1.0 / 60.0
-            
-            // 가속도계 업데이트 시작
             motionManager.startAccelerometerUpdates()
         }
     }
     
-    func movePlayerWithAcceleration(_ acceleration: CGFloat) {
-        print("now moving")
-        print(acceleration)
-        
+    func movePlayer(_ acceleration: CGFloat) {
         let moveAmount: CGFloat = 0.8
         let dx: CGFloat
+        let dAngle: CGFloat
         
         let orientation = UIDevice.current.orientation
         let directionMultiplier: CGFloat = (orientation == .landscapeRight) ? 1 : -1
         dx = (acceleration > 0) ? moveAmount * directionMultiplier : -moveAmount * directionMultiplier
+        dAngle = (acceleration > 0) ? -.pi/40 * directionMultiplier : .pi/40 * directionMultiplier
         
         let moveAction = SKAction.moveBy(x: dx, y: 0, duration: 0.2)
-        player.run(moveAction)
-    }
-    
-    func movePlayer(isMovingRight: Bool) {
-        let moveAmount: CGFloat = 20
-        let dx: CGFloat = isMovingRight ? moveAmount: -moveAmount
-        let moveAction = SKAction.moveBy(x: dx, y: 0, duration: 0.2)
-        player.run(moveAction)
+        let rotateAction = SKAction.rotate(byAngle: dAngle, duration: 0.2)
+        let groupAction = SKAction.group([moveAction, rotateAction])
+        player.run(groupAction)
     }
     
     func replacePlayerOriginPosition() {
@@ -186,10 +182,6 @@ class GameScene: SKScene {
         
         UserDefaults.standard.set(failCount, forKey: "failCount")
         UserDefaults.standard.set(lastPlayDate, forKey: "lastPlayDate")
-        
-        print(failCount)
-        print(UserDefaults.standard.integer(forKey: "failCount"))
-        print(lastPlayDate)
     }
     
     func resetFailCount() {
@@ -208,7 +200,6 @@ class GameScene: SKScene {
 
 extension GameScene: SKPhysicsContactDelegate {
     func didBegin(_ contact: SKPhysicsContact) {
-        // 충돌 처리
         var firstBody: SKPhysicsBody
         var secondBody: SKPhysicsBody
         
@@ -250,9 +241,9 @@ class Enemy: SKSpriteNode {
     
     func setPhysics() {
         self.physicsBody = SKPhysicsBody(rectangleOf: self.size)
-        self.physicsBody?.isDynamic = true  // 움직임 허용
-        self.physicsBody?.affectedByGravity = false  // 중력 영향 없음
-        self.physicsBody?.allowsRotation = false  // 캐릭터가 회전하지 않게
+        self.physicsBody?.isDynamic = true
+        self.physicsBody?.affectedByGravity = false
+        self.physicsBody?.allowsRotation = false
         self.physicsBody?.categoryBitMask = PhysicsCategory.enemy
         self.physicsBody?.collisionBitMask = PhysicsCategory.none
         self.physicsBody?.contactTestBitMask =  PhysicsCategory.player | PhysicsCategory.tile
@@ -269,10 +260,6 @@ class Enemy: SKSpriteNode {
             self.xScale = isMovingRight ? abs(self.xScale) : -abs(self.xScale)
             
             reverseLastTime = currentTime
-            
-            print("Enemy hit tile: Success")
-        } else {
-            print("Enemy hit tile: Fail - Cool Down Time")
         }
     }
 }
