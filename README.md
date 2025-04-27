@@ -11,11 +11,7 @@
 
 
 # ⏳ Development Period
-Start Date: 2025.04.15
-
-End Date: 2025.04.25
-
-Total: 10 days
+2025.04.15 ~ 2025.04.25 (10 days)
 
 # 🎮 How to play
 
