@@ -17,7 +17,7 @@
 
 
 # 🧰 Tech Stack
-SpriteKit, SwiftUI, Userdefaults
+SpriteKit, SwiftUI, CoreMotion, Userdefaults
 
 
 # 📝 Project Results
